@@ -277,29 +277,6 @@
     )
     (local.get 1)
   )
-
-  (func (export "nesting") (param i32 i32) (result i32)
-    (local i32 i32)
-    (block
-      (loop
-        (br_if 1 (i32.eq (local.get 0) (i32.const 0)))
-        (local.set 2 (local.get 1))
-        (block
-          (loop
-            (br_if 1 (i32.eq (local.get 2) (i32.const 0)))
-            (br_if 3 (i32.lt_u (local.get 2) (i32.const 0)))
-            (local.set 3 (i32.add (local.get 3) (local.get 2)))
-            (local.set 2 (i32.sub (local.get 2) (i32.const 2)))
-            (br 0)
-          )
-        )
-        (local.set 3 (i32.div_u (local.get 3) (local.get 0)))
-        (local.set 0 (i32.sub (local.get 0) (i32.const 1)))
-        (br 0)
-      )
-    )
-    (local.get 3)
-  )
 )
 
 (assert_return (invoke "empty"))
@@ -364,23 +341,6 @@
 (assert_return (invoke "for" (i64.const 3)) (i64.const 6))
 (assert_return (invoke "for" (i64.const 5)) (i64.const 120))
 (assert_return (invoke "for" (i64.const 20)) (i64.const 2432902008176640000))
-
-(assert_return (invoke "nesting" (i32.const 0) (i32.const 7)) (i32.const 0))
-(assert_return (invoke "nesting" (i32.const 7) (i32.const 0)) (i32.const 0))
-(assert_return (invoke "nesting" (i32.const 1) (i32.const 1)) (i32.const 1))
-(assert_return (invoke "nesting" (i32.const 1) (i32.const 2)) (i32.const 2))
-(assert_return (invoke "nesting" (i32.const 1) (i32.const 3)) (i32.const 4))
-(assert_return (invoke "nesting" (i32.const 1) (i32.const 4)) (i32.const 6))
-(assert_return (invoke "nesting" (i32.const 1) (i32.const 100)) (i32.const 2550))
-(assert_return (invoke "nesting" (i32.const 1) (i32.const 101)) (i32.const 2601))
-(assert_return (invoke "nesting" (i32.const 2) (i32.const 1)) (i32.const 1))
-(assert_return (invoke "nesting" (i32.const 3) (i32.const 1)) (i32.const 1))
-(assert_return (invoke "nesting" (i32.const 10) (i32.const 1)) (i32.const 1))
-(assert_return (invoke "nesting" (i32.const 2) (i32.const 2)) (i32.const 3))
-(assert_return (invoke "nesting" (i32.const 2) (i32.const 3)) (i32.const 4))
-(assert_return (invoke "nesting" (i32.const 7) (i32.const 4)) (i32.const 10))
-(assert_return (invoke "nesting" (i32.const 7) (i32.const 100)) (i32.const 4381))
-(assert_return (invoke "nesting" (i32.const 7) (i32.const 101)) (i32.const 2601))
 
 (assert_invalid
   (module (func $type-empty-i32 (result i32) (loop)))
