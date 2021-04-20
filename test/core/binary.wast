@@ -52,6 +52,44 @@
 (assert_malformed (module binary "\00asm" "\01\00\00\00" "\ff\00\01\00") "malformed section id")
 
 
+(module binary
+  "\00asm" "\01\00\00\00"
+  "\05\03\01"                          ;; Memory section with 1 entry
+  "\00\00"                             ;; no max, minimum 0
+  "\0b\06\01"                          ;; Data section with 1 entry
+  "\00"                                ;; Memory index 0
+  "\41\00\0b\00"                       ;; (i32.const 0) with contents ""
+)
+
+(module binary
+  "\00asm" "\01\00\00\00"
+  "\04\04\01"                          ;; Table section with 1 entry
+  "\70\00\00"                          ;; no max, minimum 0, funcref
+  "\09\06\01"                          ;; Element section with 1 entry
+  "\00"                                ;; Table index 0
+  "\41\00\0b\00"                       ;; (i32.const 0) with no elements
+)
+
+;; Data segment memory index can have non-minimal length
+(module binary
+  "\00asm" "\01\00\00\00"
+  "\05\03\01"                          ;; Memory section with 1 entry
+  "\00\00"                             ;; no max, minimum 0
+  "\0b\07\01"                          ;; Data section with 1 entry
+  "\80\00"                             ;; Memory index 0, encoded with 2 bytes
+  "\41\00\0b\00"                       ;; (i32.const 0) with contents ""
+)
+
+;; Element segment table index can have non-minimal length
+(module binary
+  "\00asm" "\01\00\00\00"
+  "\04\04\01"                          ;; Table section with 1 entry
+  "\70\00\00"                          ;; no max, minimum 0, funcref
+  "\09\09\01"                          ;; Element section with 1 entry
+  "\02\80\00"                          ;; Table index 0, encoded with 2 bytes
+  "\41\00\0b\00\00"                    ;; (i32.const 0) with no elements
+)
+
 ;; Type section with signed LEB128 encoded type
 (assert_malformed
   (module binary
@@ -176,7 +214,7 @@
     "\1a"                      ;; drop
     "\0b"                      ;; end
   )
-  "zero flag expected"
+  "zero byte expected"
 )
 
 ;; memory.grow reserved byte should not be a "long" LEB128 zero.
@@ -196,7 +234,7 @@
     "\1a"                      ;; drop
     "\0b"                      ;; end
   )
-  "zero flag expected"
+  "zero byte expected"
 )
 
 ;; Same as above for 3, 4, and 5-byte zero encodings.
@@ -216,7 +254,7 @@
     "\1a"                      ;; drop
     "\0b"                      ;; end
   )
-  "zero flag expected"
+  "zero byte expected"
 )
 
 (assert_malformed
@@ -235,7 +273,7 @@
     "\1a"                      ;; drop
     "\0b"                      ;; end
   )
-  "zero flag expected"
+  "zero byte expected"
 )
 
 (assert_malformed
@@ -254,7 +292,7 @@
     "\1a"                      ;; drop
     "\0b"                      ;; end
   )
-  "zero flag expected"
+  "zero byte expected"
 )
 
 ;; memory.size reserved byte equal to zero.
@@ -273,7 +311,7 @@
     "\1a"                      ;; drop
     "\0b"                      ;; end
   )
-  "zero flag expected"
+  "zero byte expected"
 )
 
 ;; memory.size reserved byte should not be a "long" LEB128 zero.
@@ -292,7 +330,7 @@
     "\1a"                      ;; drop
     "\0b"                      ;; end
   )
-  "zero flag expected"
+  "zero byte expected"
 )
 
 ;; Same as above for 3, 4, and 5-byte zero encodings.
@@ -311,7 +349,7 @@
     "\1a"                      ;; drop
     "\0b"                      ;; end
   )
-  "zero flag expected"
+  "zero byte expected"
 )
 
 (assert_malformed
@@ -329,7 +367,7 @@
     "\1a"                      ;; drop
     "\0b"                      ;; end
   )
-  "zero flag expected"
+  "zero byte expected"
 )
 
 (assert_malformed
@@ -347,7 +385,7 @@
     "\1a"                      ;; drop
     "\0b"                      ;; end
   )
-  "zero flag expected"
+  "zero byte expected"
 )
 
 ;; Local number is unsigned 32 bit
